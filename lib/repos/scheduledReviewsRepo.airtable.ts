@@ -14,7 +14,6 @@ import type { ScheduledReviewsRepo } from "./types";
  *   "Platform Name"    -> platform
  *   "Business Name"    -> businessName
  *   "Client Website"   -> clientWebsite
- *   "Location Name"    -> locationName   (formula field, read-only)
  *   "Review Content"   -> reviewContent
  *   "Listing URL"      -> listingUrl
  *   "Google Place ID"  -> googlePlaceId

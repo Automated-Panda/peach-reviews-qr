@@ -6,7 +6,6 @@
  *   platform      -> "Platform Name"      (Single line text)
  *   businessName  -> "Business Name"      (Single line text)
  *   clientWebsite -> "Client Website"     (URL)
- *   locationName  -> "Location Name"      (Formula: {Client} - {Platform} - {Listing Group})
  *   reviewContent -> "Review Content"     (Long text)
  *   listingUrl    -> "Listing URL"        (URL)
  *   googlePlaceId -> "Google Place ID"    (Single line text, optional)
@@ -31,7 +30,6 @@ export interface ScheduledReviewPublic {
   platform: Platform;
   businessName: string;
   clientWebsite?: string;
-  locationName: string;
   reviewContent: string;
   listingUrl: string;
   googlePlaceId?: string;
