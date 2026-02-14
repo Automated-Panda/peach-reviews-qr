@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+body {
+  background-color: #f5f6f7;
+}
+
+/* Print styles for poster page */
+@media print {
+  body {
+    background-color: white !important;
+  }
+
+  .poster-card {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
