@@ -4,6 +4,8 @@
  * Airtable field mapping (table: "Scheduled Reviews"):
  *   token         -> "Public ID"          (Single line text)
  *   platform      -> "Platform Name"      (Single line text)
+ *   businessName  -> "Business Name"      (Single line text)
+ *   clientWebsite -> "Client Website"     (URL)
  *   locationName  -> "Location Name"      (Formula: {Client} - {Platform} - {Listing Group})
  *   reviewContent -> "Review Content"     (Long text)
  *   listingUrl    -> "Listing URL"        (URL)
@@ -27,6 +29,8 @@ export type Platform =
 export interface ScheduledReviewPublic {
   token: string;
   platform: Platform;
+  businessName: string;
+  clientWebsite?: string;
   locationName: string;
   reviewContent: string;
   listingUrl: string;

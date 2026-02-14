@@ -4,6 +4,7 @@ import QrCode from "@/components/QrCode";
 
 interface GooglePosterProps {
   qrUrl: string;
+  businessName: string;
 }
 
 /**
@@ -20,9 +21,17 @@ const GOOGLE_LETTERS: { letter: string; color: string }[] = [
   { letter: "e", color: "#EA4335" },
 ];
 
-export default function GooglePoster({ qrUrl }: GooglePosterProps) {
+export default function GooglePoster({
+  qrUrl,
+  businessName,
+}: GooglePosterProps) {
   return (
-    <div className="poster-card bg-white rounded-2xl shadow-lg max-w-md mx-auto px-8 py-10 text-center">
+    <div className="poster-card bg-white rounded-2xl shadow-lg max-w-2xl w-full mx-auto px-10 py-12 text-center">
+      {/* Business name */}
+      <h1 className="text-2xl font-semibold text-[#202124] mb-8">
+        {businessName}
+      </h1>
+
       {/* Google-colored ring with text inside */}
       <div className="relative mb-6">
         <GoogleRing />
@@ -59,8 +68,6 @@ export default function GooglePoster({ qrUrl }: GooglePosterProps) {
         <QrCode url={qrUrl} size={240} />
       </div>
 
-      {/* Footer */}
-      <p className="text-xs text-[#9aa0a6]">Powered by Peach Reviews</p>
     </div>
   );
 }

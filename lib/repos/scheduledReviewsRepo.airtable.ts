@@ -12,6 +12,8 @@ import type { ScheduledReviewsRepo } from "./types";
  * Field mapping (Airtable field name -> ScheduledReviewPublic key):
  *   "Public ID"        -> token
  *   "Platform Name"    -> platform
+ *   "Business Name"    -> businessName
+ *   "Client Website"   -> clientWebsite
  *   "Location Name"    -> locationName   (formula field, read-only)
  *   "Review Content"   -> reviewContent
  *   "Listing URL"      -> listingUrl

@@ -35,7 +35,7 @@ export default async function PublicReviewPage({ params }: Props) {
   return (
     <ReviewPageClient
       token={review.token}
-      locationName={review.locationName}
+      businessName={review.businessName}
       reviewContent={review.reviewContent}
       listingUrl={review.listingUrl}
       googlePlaceId={review.googlePlaceId}

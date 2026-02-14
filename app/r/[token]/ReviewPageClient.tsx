@@ -8,7 +8,7 @@ import { buildMapsWebUrl, buildMapsAppUrl } from "@/lib/maps";
 
 interface ReviewPageClientProps {
   token: string;
-  locationName: string;
+  businessName: string;
   reviewContent: string;
   listingUrl: string;
   googlePlaceId?: string;
@@ -16,7 +16,7 @@ interface ReviewPageClientProps {
 
 export default function ReviewPageClient({
   token,
-  locationName,
+  businessName,
   reviewContent,
   listingUrl,
   googlePlaceId,
@@ -71,9 +71,9 @@ export default function ReviewPageClient({
   return (
     <main className="min-h-screen flex items-start justify-center px-4 py-10 sm:py-16">
       <div className="w-full max-w-[520px]">
-        {/* Location name */}
+        {/* Business name */}
         <h1 className="text-center text-[22px] sm:text-[26px] font-medium text-[#202124] mb-5">
-          {locationName}
+          {businessName}
         </h1>
 
         {/* Review content */}
@@ -97,6 +97,11 @@ export default function ReviewPageClient({
         <Button variant="outline" onClick={handlePasteOnGoogle}>
           Paste Review on Google &rarr;
         </Button>
+
+        {/* Google Maps hint */}
+        <p className="text-center text-xs text-[#9aa0a6] mt-2">
+          If prompted, select Google Maps to open
+        </p>
       </div>
 
       <Toast

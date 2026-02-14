@@ -45,7 +45,7 @@ export default async function ProviderPosterPage({ params }: Props) {
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6 print:p-0 print:bg-white">
-      <GooglePoster qrUrl={qrUrl} />
+      <GooglePoster qrUrl={qrUrl} businessName={review.businessName} />
     </main>
   );
 }
