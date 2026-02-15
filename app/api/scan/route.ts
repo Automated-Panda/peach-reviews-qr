@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       "unknown";
     const rateLimitKey = `scan:${ip}:${token}`;
 
-    if (isRateLimited(rateLimitKey)) {
+    if (await isRateLimited(rateLimitKey)) {
       return NextResponse.json(
         { ok: false, error: "Too many requests" },
         { status: 429 }

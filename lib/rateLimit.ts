@@ -1,31 +1,30 @@
-/**
- * Lightweight in-memory rate limiter.
- *
- * CAVEAT: On Vercel (serverless), each function invocation may run in a
- * separate instance, so this Map won't be shared across instances and
- * resets on cold starts. This is fine for local dev.
- *
- * For production, swap this out with Upstash Redis + @upstash/ratelimit:
- *   npm install @upstash/ratelimit @upstash/redis
- *
- *   import { Ratelimit } from "@upstash/ratelimit";
- *   import { Redis } from "@upstash/redis";
- *   const ratelimit = new Ratelimit({
- *     redis: Redis.fromEnv(),
- *     limiter: Ratelimit.slidingWindow(10, "60 s"),
- *   });
- */
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+// ---------------------------------------------------------------------------
+// Upstash Redis rate limiter (production)
+// Falls back to in-memory limiter when UPSTASH env vars are not set.
+// ---------------------------------------------------------------------------
+
+const upstashRatelimit =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? new Ratelimit({
+        redis: Redis.fromEnv(),
+        limiter: Ratelimit.slidingWindow(10, "60 s"),
+      })
+    : null;
+
+// ---------------------------------------------------------------------------
+// In-memory fallback (local dev)
+// ---------------------------------------------------------------------------
 
 const hits = new Map<string, number[]>();
+const WINDOW_MS = 60_000;
+const MAX_HITS = 10;
 
-const WINDOW_MS = 60_000; // 1 minute
-const MAX_HITS = 10; // max requests per window per key
-
-export function isRateLimited(key: string): boolean {
+function isRateLimitedLocal(key: string): boolean {
   const now = Date.now();
   const timestamps = hits.get(key) ?? [];
-
-  // Prune entries outside the window
   const recent = timestamps.filter((t) => now - t < WINDOW_MS);
 
   if (recent.length >= MAX_HITS) {
@@ -36,4 +35,16 @@ export function isRateLimited(key: string): boolean {
   recent.push(now);
   hits.set(key, recent);
   return false;
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+export async function isRateLimited(key: string): Promise<boolean> {
+  if (upstashRatelimit) {
+    const { success } = await upstashRatelimit.limit(key);
+    return !success;
+  }
+  return isRateLimitedLocal(key);
 }
