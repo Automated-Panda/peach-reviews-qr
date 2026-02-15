@@ -12,7 +12,7 @@ import type { ScheduledReviewPublic } from "@/lib/types";
  *    from cache instantly, no Airtable round-trip.
  *
  * Cache key: ["review", token]
- * TTL: 5 minutes (review content rarely changes between poster view and scan)
+ * TTL: 24 hours (review content doesn't change once created)
  *
  * On Vercel, unstable_cache persists across serverless invocations via
  * their Data Cache infrastructure. Locally it persists for the dev
@@ -23,5 +23,5 @@ export const getCachedReview = unstable_cache(
     return repo.getByToken(token);
   },
   ["review"],
-  { revalidate: 300 } // 5 minutes
+  { revalidate: 86_400 } // 24 hours
 );
