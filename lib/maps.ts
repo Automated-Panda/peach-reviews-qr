@@ -14,7 +14,7 @@ export function buildMapsWebUrl(opts: {
   listingUrl: string;
 }): string {
   if (opts.googlePlaceId) {
-    return `https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${encodeURIComponent(opts.googlePlaceId)}`;
+    return `https://search.google.com/local/writereview?placeid=${encodeURIComponent(opts.googlePlaceId)}`;
   }
   return opts.listingUrl;
 }

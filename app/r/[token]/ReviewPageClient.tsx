@@ -55,13 +55,17 @@ export default function ReviewPageClient({
     const appUrl = buildMapsAppUrl(googlePlaceId);
     const webUrl = buildMapsWebUrl({ googlePlaceId, listingUrl });
 
-    if (appUrl) {
-      // Try to open Google Maps app first (iOS/Android deep link).
-      // If the app isn't installed, the browser ignores the custom scheme
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (appUrl && isMobile) {
+      // On mobile, try the Google Maps app deep link first.
+      // If the app isn't installed the browser ignores the custom scheme
       // and we fall back to the web URL after a short delay.
       window.location.href = appUrl;
       setTimeout(() => {
-        window.open(webUrl, "_blank", "noopener,noreferrer");
+        if (!document.hidden) {
+          window.open(webUrl, "_blank", "noopener,noreferrer");
+        }
       }, 500);
     } else {
       window.open(webUrl, "_blank", "noopener,noreferrer");
