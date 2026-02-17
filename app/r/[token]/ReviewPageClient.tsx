@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Toast from "@/components/ui/Toast";
-import { buildMapsWebUrl, buildMapsAppUrl } from "@/lib/maps";
+import { buildMapsWebUrl } from "@/lib/maps";
 
 interface ReviewPageClientProps {
   token: string;
@@ -51,26 +51,7 @@ export default function ReviewPageClient({
     setToastVisible(true);
   }, [reviewContent]);
 
-  const handlePasteOnGoogle = useCallback(() => {
-    const appUrl = buildMapsAppUrl(googlePlaceId);
-    const webUrl = buildMapsWebUrl({ googlePlaceId, listingUrl });
-
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (appUrl && isMobile) {
-      // On mobile, try the Google Maps app deep link first.
-      // If the app isn't installed the browser ignores the custom scheme
-      // and we fall back to the web URL after a short delay.
-      window.location.href = appUrl;
-      setTimeout(() => {
-        if (!document.hidden) {
-          window.open(webUrl, "_blank", "noopener,noreferrer");
-        }
-      }, 500);
-    } else {
-      window.open(webUrl, "_blank", "noopener,noreferrer");
-    }
-  }, [googlePlaceId, listingUrl]);
+  const reviewUrl = buildMapsWebUrl({ googlePlaceId, listingUrl });
 
   return (
     <main className="min-h-screen flex items-start justify-center px-4 py-10 sm:py-16">
@@ -97,15 +78,10 @@ export default function ReviewPageClient({
           Then tap below to paste it
         </p>
 
-        {/* CTA button */}
-        <Button variant="outline" onClick={handlePasteOnGoogle}>
+        {/* CTA button – plain <a> tag via href to avoid Google bot detection */}
+        <Button variant="outline" href={reviewUrl}>
           Paste Review on Google &rarr;
         </Button>
-
-        {/* Google Maps hint */}
-        <p className="text-center text-xs text-[#9aa0a6] mt-2">
-          If prompted, select Google Maps to open
-        </p>
       </div>
 
       <Toast

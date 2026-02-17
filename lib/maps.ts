@@ -20,15 +20,6 @@ export function buildMapsWebUrl(opts: {
 }
 
 /**
- * Build an iOS Google Maps app deep-link (comgooglemaps:// scheme).
- * Returns null if no googlePlaceId is available (scheme requires it).
- */
-export function buildMapsAppUrl(googlePlaceId?: string): string | null {
-  if (!googlePlaceId) return null;
-  return `comgooglemaps://?q=place_id:${encodeURIComponent(googlePlaceId)}`;
-}
-
-/**
  * Resolve a shortened Google URL (share.google/*, maps.app.goo.gl/*)
  * to its final destination by following redirects server-side.
  *
