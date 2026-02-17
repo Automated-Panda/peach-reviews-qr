@@ -2,12 +2,12 @@
  * Build the best Google Maps link for a listing.
  *
  * Priority:
- * 1. If googlePlaceId exists, use Google Maps search with place_id query param.
- * 2. Otherwise fall back to the raw listingUrl.
- *
- * The iOS Google Maps app URL scheme (comgooglemaps://) is attempted
- * client-side in the review page component so we can feature-detect.
+ * 1. If googlePlaceId exists, use the direct Google review URL.
+ * 2. Otherwise fall back to the listingUrl (with tracking params stripped).
  */
+
+/** Google tracking params that trigger bot detection when reused. */
+const STRIP_PARAMS = ["entry", "g_ep", "skid"];
 
 export function buildMapsWebUrl(opts: {
   googlePlaceId?: string;
@@ -16,7 +16,13 @@ export function buildMapsWebUrl(opts: {
   if (opts.googlePlaceId) {
     return `https://search.google.com/local/writereview?placeid=${encodeURIComponent(opts.googlePlaceId)}`;
   }
-  return opts.listingUrl;
+  try {
+    const url = new URL(opts.listingUrl);
+    STRIP_PARAMS.forEach((p) => url.searchParams.delete(p));
+    return url.toString();
+  } catch {
+    return opts.listingUrl;
+  }
 }
 
 /**
@@ -35,16 +41,50 @@ export async function resolveListingUrl(url: string): Promise<string> {
     const hostname = new URL(url).hostname;
     if (!SHORTENER_HOSTS.includes(hostname)) return url;
 
-    // Follow redirects to get the final destination URL.
     const response = await fetch(url, { redirect: "follow" });
     const finalUrl = response.url;
+    if (!finalUrl) return url;
 
-    // maps.app.goo.gl links resolve to maps.google.com with ftid (exact listing).
-    // These work perfectly with universal links on mobile → opens Maps app.
-    // share.google links resolve to google.com/search — less precise, but
-    // still functional as a fallback until the URL is replaced with a Maps link.
-    return finalUrl || url;
+    // Strip tracking params that trigger bot detection when reused.
+    const parsed = new URL(finalUrl);
+    STRIP_PARAMS.forEach((p) => parsed.searchParams.delete(p));
+    return parsed.toString();
   } catch {
     return url;
+  }
+}
+
+/**
+ * Look up a Google Place ID for a business using the Places API (New).
+ * Returns undefined if the API key isn't configured or the lookup fails.
+ */
+export async function lookupPlaceId(
+  businessName: string,
+): Promise<string | undefined> {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+  if (!apiKey) return undefined;
+
+  try {
+    const res = await fetch(
+      "https://places.googleapis.com/v1/places:searchText",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": apiKey,
+          "X-Goog-FieldMask": "places.id",
+        },
+        body: JSON.stringify({ textQuery: businessName }),
+      },
+    );
+
+    if (!res.ok) return undefined;
+
+    const data = (await res.json()) as {
+      places?: { id: string }[];
+    };
+    return data.places?.[0]?.id;
+  } catch {
+    return undefined;
   }
 }

@@ -1,7 +1,7 @@
 import Airtable from "airtable";
 import type { ScheduledReviewsRepo } from "./types";
 import type { ScheduledReviewPublic } from "@/lib/types";
-import { resolveListingUrl } from "@/lib/maps";
+import { resolveListingUrl, lookupPlaceId } from "@/lib/maps";
 
 /**
  * Airtable implementation of ScheduledReviewsRepo.
@@ -63,6 +63,19 @@ export const airtableRepo: ScheduledReviewsRepo = {
     // Resolve shortened URLs (share.google, maps.app.goo.gl) to full
     // Google Maps URLs so universal links open the Maps app on mobile.
     review.listingUrl = await resolveListingUrl(review.listingUrl);
+
+    // Auto-resolve Google Place ID if missing, then persist to Airtable
+    // so future fetches skip the API call.
+    if (!review.googlePlaceId) {
+      const placeId = await lookupPlaceId(review.businessName);
+      if (placeId) {
+        review.googlePlaceId = placeId;
+        await table
+          .update(records[0].id, { "Google Place ID": placeId })
+          .catch(() => {});
+      }
+    }
+
     return review;
   },
 
