@@ -52,9 +52,8 @@ export default function ReviewPageClient({
     setCopied(true);
   }, [reviewContent]);
 
-  // Fire-and-forget copy for app buttons — must be synchronous
-  // so the browser doesn't consume the user gesture before navigating
-  const copyAndNavigate = useCallback(() => {
+  // Copy via pointerdown so it fires before click/navigation
+  const handlePointerDown = useCallback(() => {
     navigator.clipboard.writeText(reviewContent).catch(() => {});
     setCopied(true);
   }, [reviewContent]);
@@ -103,7 +102,6 @@ export default function ReviewPageClient({
         {/* Deep-link buttons – auto-copy on click, app-specific schemes bypass Safari */}
         <a
           href={mapsAppUrl}
-          onClick={copyAndNavigate}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -113,7 +111,6 @@ export default function ReviewPageClient({
         </a>
         <a
           href={googleAppUrl}
-          onClick={copyAndNavigate}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -123,7 +120,6 @@ export default function ReviewPageClient({
         </a>
         <a
           href={chromeUrl}
-          onClick={copyAndNavigate}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
