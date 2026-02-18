@@ -2,9 +2,12 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Card from "@/components/ui/Card";
-import Button from "@/components/ui/Button";
-import Toast from "@/components/ui/Toast";
-import { buildMapsWebUrl } from "@/lib/maps";
+import {
+  buildMapsWebUrl,
+  buildGoogleMapsAppUrl,
+  buildGoogleAppUrl,
+  buildChromeUrl,
+} from "@/lib/maps";
 
 interface ReviewPageClientProps {
   token: string;
@@ -21,7 +24,7 @@ export default function ReviewPageClient({
   listingUrl,
   googlePlaceId,
 }: ReviewPageClientProps) {
-  const [toastVisible, setToastVisible] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Log scan on page load
   useEffect(() => {
@@ -29,16 +32,13 @@ export default function ReviewPageClient({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
-    }).catch(() => {
-      // Scan logging is best-effort; don't break the page
-    });
+    }).catch(() => {});
   }, [token]);
 
-  const handleCopy = useCallback(async () => {
+  const copyToClipboard = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(reviewContent);
     } catch {
-      // Fallback for older browsers
       const textarea = document.createElement("textarea");
       textarea.value = reviewContent;
       textarea.style.position = "fixed";
@@ -48,10 +48,13 @@ export default function ReviewPageClient({
       document.execCommand("copy");
       document.body.removeChild(textarea);
     }
-    setToastVisible(true);
+    setCopied(true);
   }, [reviewContent]);
 
   const reviewUrl = buildMapsWebUrl({ googlePlaceId, listingUrl });
+  const mapsAppUrl = buildGoogleMapsAppUrl({ googlePlaceId, businessName });
+  const googleAppUrl = buildGoogleAppUrl(reviewUrl);
+  const chromeUrl = buildChromeUrl(reviewUrl);
 
   return (
     <main className="min-h-screen flex items-start justify-center px-4 py-10 sm:py-16">
@@ -61,34 +64,66 @@ export default function ReviewPageClient({
           {businessName}
         </h1>
 
-        {/* Review content */}
-        <Card className="mb-5">
-          <p className="text-[#3c4043] text-[15px] leading-relaxed whitespace-pre-line">
+        {/* Review content with inline copy icon */}
+        <Card className="mb-5 relative">
+          <p className="text-[#3c4043] text-[15px] leading-relaxed whitespace-pre-line pr-8">
             {reviewContent}
           </p>
+          <button
+            onClick={copyToClipboard}
+            className="absolute top-3 right-3 p-1.5 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+            aria-label="Copy review"
+          >
+            {copied ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34A853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            )}
+          </button>
         </Card>
-
-        {/* Copy button */}
-        <Button variant="primary" onClick={handleCopy} className="mb-3">
-          Copy Review
-        </Button>
 
         {/* Helper text */}
         <p className="text-center text-sm text-[#9aa0a6] mb-3">
-          Then tap below to paste it
+          Tap a button to copy &amp; paste your review
         </p>
 
-        {/* CTA button – plain <a> tag via href to avoid Google bot detection */}
-        <Button variant="outline" href={reviewUrl}>
-          Paste Review on Google &rarr;
-        </Button>
+        {/* Deep-link buttons – auto-copy on click, app-specific schemes bypass Safari */}
+        <a
+          href={mapsAppUrl}
+          onClick={copyToClipboard}
+          className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
+        >
+          <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
+            <img src="/icons/google-maps.svg" alt="" width={14} height={14} />
+          </span>
+          Open in Google Maps
+        </a>
+        <a
+          href={googleAppUrl}
+          onClick={copyToClipboard}
+          className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
+        >
+          <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
+            <img src="/icons/google.svg" alt="" width={18} height={18} />
+          </span>
+          Open in Google App
+        </a>
+        <a
+          href={chromeUrl}
+          onClick={copyToClipboard}
+          className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors"
+        >
+          <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
+            <img src="/icons/chrome.svg" alt="" width={20} height={20} />
+          </span>
+          Open in Chrome App
+        </a>
       </div>
-
-      <Toast
-        message="Copied!"
-        visible={toastVisible}
-        onDone={() => setToastVisible(false)}
-      />
     </main>
   );
 }

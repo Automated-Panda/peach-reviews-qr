@@ -26,6 +26,30 @@ export function buildMapsWebUrl(opts: {
 }
 
 /**
+ * Deep-link URLs that open in specific apps instead of Safari.
+ */
+
+/** Google Maps app (comgooglemaps:// scheme). */
+export function buildGoogleMapsAppUrl(
+  opts: { googlePlaceId?: string; businessName: string },
+): string {
+  if (opts.googlePlaceId) {
+    return `comgooglemaps://?q=place_id:${encodeURIComponent(opts.googlePlaceId)}`;
+  }
+  return `comgooglemaps://?q=${encodeURIComponent(opts.businessName)}`;
+}
+
+/** Google app (google:// scheme). */
+export function buildGoogleAppUrl(webUrl: string): string {
+  return `google://open-url?url=${encodeURIComponent(webUrl)}`;
+}
+
+/** Chrome browser (googlechromes:// scheme). */
+export function buildChromeUrl(webUrl: string): string {
+  return webUrl.replace(/^https:\/\//i, "googlechromes://");
+}
+
+/**
  * Resolve a shortened Google URL (share.google/*, maps.app.goo.gl/*)
  * to its final destination by following redirects server-side.
  *
