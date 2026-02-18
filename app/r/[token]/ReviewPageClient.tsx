@@ -97,12 +97,13 @@ export default function ReviewPageClient({
 
         {/* Helper text */}
         <p className="text-center text-sm text-[#9aa0a6] mb-3">
-          Tap the copy icon above, then open your preferred app
+          Tap a button to copy &amp; paste your review
         </p>
 
         {/* Deep-link buttons – intent:// on Android, custom schemes on iOS */}
         <a
           href={mapsAppUrl}
+          onClick={() => navigator.clipboard.writeText(reviewContent).catch(() => {})}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -112,6 +113,7 @@ export default function ReviewPageClient({
         </a>
         <a
           href={googleAppUrl}
+          onClick={() => navigator.clipboard.writeText(reviewContent).catch(() => {})}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -121,6 +123,7 @@ export default function ReviewPageClient({
         </a>
         <a
           href={chromeUrl}
+          onClick={() => navigator.clipboard.writeText(reviewContent).catch(() => {})}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
