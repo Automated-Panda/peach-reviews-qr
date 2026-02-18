@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Card from "@/components/ui/Card";
 import {
   buildMapsWebUrl,
@@ -25,6 +25,14 @@ export default function ReviewPageClient({
   googlePlaceId,
 }: ReviewPageClientProps) {
   const [copied, setCopied] = useState(false);
+  const [platform, setPlatform] = useState<"ios" | "android">("ios");
+
+  // Detect platform after mount to avoid SSR hydration mismatch
+  useEffect(() => {
+    if (/Android/i.test(navigator.userAgent)) {
+      setPlatform("android");
+    }
+  }, []);
 
   // Log scan on page load
   useEffect(() => {
@@ -35,7 +43,6 @@ export default function ReviewPageClient({
     }).catch(() => {});
   }, [token]);
 
-  // Async copy for the manual copy icon
   const copyToClipboard = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(reviewContent);
@@ -51,17 +58,6 @@ export default function ReviewPageClient({
     }
     setCopied(true);
   }, [reviewContent]);
-
-  // Copy via pointerdown so it fires before click/navigation
-  const handlePointerDown = useCallback(() => {
-    navigator.clipboard.writeText(reviewContent).catch(() => {});
-    setCopied(true);
-  }, [reviewContent]);
-
-  const platform = useMemo(
-    () => (/Android/i.test(navigator.userAgent) ? "android" as const : "ios" as const),
-    [],
-  );
 
   const reviewUrl = buildMapsWebUrl({ googlePlaceId, listingUrl });
   const mapsAppUrl = buildGoogleMapsAppUrl({ googlePlaceId, businessName, webUrl: reviewUrl, platform });
@@ -101,13 +97,12 @@ export default function ReviewPageClient({
 
         {/* Helper text */}
         <p className="text-center text-sm text-[#9aa0a6] mb-3">
-          Tap a button to copy &amp; paste your review
+          Tap the copy icon above, then open your preferred app
         </p>
 
-        {/* Deep-link buttons – auto-copy on click, app-specific schemes bypass Safari */}
+        {/* Deep-link buttons – intent:// on Android, custom schemes on iOS */}
         <a
           href={mapsAppUrl}
-          onPointerDown={handlePointerDown}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -117,7 +112,6 @@ export default function ReviewPageClient({
         </a>
         <a
           href={googleAppUrl}
-          onPointerDown={handlePointerDown}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -127,7 +121,6 @@ export default function ReviewPageClient({
         </a>
         <a
           href={chromeUrl}
-          onPointerDown={handlePointerDown}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
