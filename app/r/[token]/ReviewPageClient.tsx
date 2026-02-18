@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Card from "@/components/ui/Card";
 import {
   buildMapsWebUrl,
@@ -58,10 +58,15 @@ export default function ReviewPageClient({
     setCopied(true);
   }, [reviewContent]);
 
+  const platform = useMemo(
+    () => (/Android/i.test(navigator.userAgent) ? "android" as const : "ios" as const),
+    [],
+  );
+
   const reviewUrl = buildMapsWebUrl({ googlePlaceId, listingUrl });
-  const mapsAppUrl = buildGoogleMapsAppUrl({ googlePlaceId, businessName });
-  const googleAppUrl = buildGoogleAppUrl(reviewUrl);
-  const chromeUrl = buildChromeUrl(reviewUrl);
+  const mapsAppUrl = buildGoogleMapsAppUrl({ googlePlaceId, businessName, webUrl: reviewUrl, platform });
+  const googleAppUrl = buildGoogleAppUrl(reviewUrl, platform);
+  const chromeUrl = buildChromeUrl(reviewUrl, platform);
 
   return (
     <main className="min-h-screen flex items-start justify-center px-4 py-10 sm:py-16">
@@ -102,6 +107,7 @@ export default function ReviewPageClient({
         {/* Deep-link buttons – auto-copy on click, app-specific schemes bypass Safari */}
         <a
           href={mapsAppUrl}
+          onPointerDown={handlePointerDown}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -111,6 +117,7 @@ export default function ReviewPageClient({
         </a>
         <a
           href={googleAppUrl}
+          onPointerDown={handlePointerDown}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -120,6 +127,7 @@ export default function ReviewPageClient({
         </a>
         <a
           href={chromeUrl}
+          onPointerDown={handlePointerDown}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">

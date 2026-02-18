@@ -26,26 +26,45 @@ export function buildMapsWebUrl(opts: {
 }
 
 /**
- * Deep-link URLs that open in specific apps instead of Safari.
+ * Deep-link URLs that open in specific apps.
+ *
+ * iOS uses custom URL schemes (comgooglemaps://, google://, googlechromes://).
+ * Android uses intent:// URIs with package names.
  */
 
-/** Google Maps app (comgooglemaps:// scheme). */
+type Platform = "ios" | "android";
+
+function toIntent(webUrl: string, pkg: string): string {
+  const withoutScheme = webUrl.replace(/^https:\/\//i, "");
+  return `intent://${withoutScheme}#Intent;scheme=https;package=${pkg};end`;
+}
+
+/** Google Maps app. */
 export function buildGoogleMapsAppUrl(
-  opts: { googlePlaceId?: string; businessName: string },
+  opts: { googlePlaceId?: string; businessName: string; webUrl: string; platform: Platform },
 ): string {
+  if (opts.platform === "android") {
+    return toIntent(opts.webUrl, "com.google.android.apps.maps");
+  }
   if (opts.googlePlaceId) {
     return `comgooglemaps://?q=place_id:${encodeURIComponent(opts.googlePlaceId)}`;
   }
   return `comgooglemaps://?q=${encodeURIComponent(opts.businessName)}`;
 }
 
-/** Google app (google:// scheme). */
-export function buildGoogleAppUrl(webUrl: string): string {
+/** Google app. */
+export function buildGoogleAppUrl(webUrl: string, platform: Platform): string {
+  if (platform === "android") {
+    return toIntent(webUrl, "com.google.android.googlequicksearchbox");
+  }
   return `google://open-url?url=${encodeURIComponent(webUrl)}`;
 }
 
-/** Chrome browser (googlechromes:// scheme). */
-export function buildChromeUrl(webUrl: string): string {
+/** Chrome browser. */
+export function buildChromeUrl(webUrl: string, platform: Platform): string {
+  if (platform === "android") {
+    return toIntent(webUrl, "com.android.chrome");
+  }
   return webUrl.replace(/^https:\/\//i, "googlechromes://");
 }
 
