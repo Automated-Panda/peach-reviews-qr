@@ -35,6 +35,7 @@ export default function ReviewPageClient({
     }).catch(() => {});
   }, [token]);
 
+  // Async copy for the manual copy icon
   const copyToClipboard = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(reviewContent);
@@ -48,6 +49,13 @@ export default function ReviewPageClient({
       document.execCommand("copy");
       document.body.removeChild(textarea);
     }
+    setCopied(true);
+  }, [reviewContent]);
+
+  // Fire-and-forget copy for app buttons — must be synchronous
+  // so the browser doesn't consume the user gesture before navigating
+  const copyAndNavigate = useCallback(() => {
+    navigator.clipboard.writeText(reviewContent).catch(() => {});
     setCopied(true);
   }, [reviewContent]);
 
@@ -95,7 +103,7 @@ export default function ReviewPageClient({
         {/* Deep-link buttons – auto-copy on click, app-specific schemes bypass Safari */}
         <a
           href={mapsAppUrl}
-          onClick={copyToClipboard}
+          onClick={copyAndNavigate}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -105,7 +113,7 @@ export default function ReviewPageClient({
         </a>
         <a
           href={googleAppUrl}
-          onClick={copyToClipboard}
+          onClick={copyAndNavigate}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors mb-2"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
@@ -115,7 +123,7 @@ export default function ReviewPageClient({
         </a>
         <a
           href={chromeUrl}
-          onClick={copyToClipboard}
+          onClick={copyAndNavigate}
           className="w-full h-[52px] rounded-lg font-medium text-base text-[#3c4043] bg-white border border-[#dadce0] hover:bg-gray-50 relative inline-flex items-center justify-center no-underline transition-colors"
         >
           <span className="absolute left-3 w-8 h-8 inline-flex items-center justify-center">
