@@ -6,7 +6,6 @@
     "clientWebsite": "https://joespizza.com",
     "reviewContent": "Absolutely love Joe's Pizza! The crust is perfectly crispy, the sauce has just the right amount of tang, and the staff is always friendly. Every time I visit, my order is ready fast and tastes amazing. Highly recommend the pepperoni — best in the city!",
     "listingUrl": "https://www.google.com/maps/place/Joe's+Pizza",
-    "googlePlaceId": "ChIJExamplePlaceId123",
     "qrStatus": "Active",
     "qrScanCount": 0,
     "lastQrScan": null
@@ -18,7 +17,6 @@
     "clientWebsite": "https://sunrisefamilydental.com",
     "reviewContent": "Dr. Patel and the entire team at Sunrise Family Dental are wonderful. The office is clean, appointments run on time, and they always explain everything clearly. I used to dread going to the dentist, but they've completely changed that. Five stars!",
     "listingUrl": "https://www.google.com/maps/place/Sunrise+Family+Dental",
-    "googlePlaceId": "ChIJExamplePlaceId456",
     "qrStatus": "Active",
     "qrScanCount": 5,
     "lastQrScan": "2025-06-10T14:30:00Z"

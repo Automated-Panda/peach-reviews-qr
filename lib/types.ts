@@ -8,7 +8,6 @@
  *   clientWebsite -> "Client Website"     (URL)
  *   reviewContent -> "Review Content"     (Long text)
  *   listingUrl    -> "Listing URL"        (URL)
- *   googlePlaceId -> "Google Place ID"    (Single line text, optional)
  *   qrScanCount   -> "QR Scan Count"      (Number)
  *   lastQrScan    -> "Last QR Scan"       (Date/Time)
  *   qrStatus      -> "QR Status"          (Single select: Active | Inactive)
@@ -32,7 +31,6 @@ export interface ScheduledReviewPublic {
   clientWebsite?: string;
   reviewContent: string;
   listingUrl: string;
-  googlePlaceId?: string;
   qrStatus: "Active" | "Inactive";
   qrScanCount: number;
   lastQrScan?: string; // ISO 8601

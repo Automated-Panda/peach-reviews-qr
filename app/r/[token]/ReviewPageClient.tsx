@@ -14,7 +14,6 @@ interface ReviewPageClientProps {
   businessName: string;
   reviewContent: string;
   listingUrl: string;
-  googlePlaceId?: string;
 }
 
 export default function ReviewPageClient({
@@ -22,7 +21,6 @@ export default function ReviewPageClient({
   businessName,
   reviewContent,
   listingUrl,
-  googlePlaceId,
 }: ReviewPageClientProps) {
   const [copied, setCopied] = useState(false);
   const [platform, setPlatform] = useState<"ios" | "android">("ios");
@@ -59,8 +57,8 @@ export default function ReviewPageClient({
     setCopied(true);
   }, [reviewContent]);
 
-  const reviewUrl = buildMapsWebUrl({ googlePlaceId, listingUrl });
-  const mapsAppUrl = buildGoogleMapsAppUrl({ googlePlaceId, businessName, webUrl: reviewUrl, platform });
+  const reviewUrl = buildMapsWebUrl(listingUrl);
+  const mapsAppUrl = buildGoogleMapsAppUrl({ businessName, webUrl: reviewUrl, platform });
   const googleAppUrl = buildGoogleAppUrl(reviewUrl, platform);
   const chromeUrl = buildChromeUrl(reviewUrl, platform);
 

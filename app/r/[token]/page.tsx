@@ -38,7 +38,6 @@ export default async function PublicReviewPage({ params }: Props) {
       businessName={review.businessName}
       reviewContent={review.reviewContent}
       listingUrl={review.listingUrl}
-      googlePlaceId={review.googlePlaceId}
     />
   );
 }

@@ -1,27 +1,18 @@
 /**
  * Build the best Google Maps link for a listing.
- *
- * Priority:
- * 1. If googlePlaceId exists, use the direct Google review URL.
- * 2. Otherwise fall back to the listingUrl (with tracking params stripped).
+ * Returns the listingUrl with tracking params stripped.
  */
 
 /** Google tracking params that trigger bot detection when reused. */
 const STRIP_PARAMS = ["entry", "g_ep", "skid"];
 
-export function buildMapsWebUrl(opts: {
-  googlePlaceId?: string;
-  listingUrl: string;
-}): string {
-  if (opts.googlePlaceId) {
-    return `https://search.google.com/local/writereview?placeid=${encodeURIComponent(opts.googlePlaceId)}`;
-  }
+export function buildMapsWebUrl(listingUrl: string): string {
   try {
-    const url = new URL(opts.listingUrl);
+    const url = new URL(listingUrl);
     STRIP_PARAMS.forEach((p) => url.searchParams.delete(p));
     return url.toString();
   } catch {
-    return opts.listingUrl;
+    return listingUrl;
   }
 }
 
@@ -41,13 +32,10 @@ function toIntent(webUrl: string, pkg: string): string {
 
 /** Google Maps app. */
 export function buildGoogleMapsAppUrl(
-  opts: { googlePlaceId?: string; businessName: string; webUrl: string; platform: Platform },
+  opts: { businessName: string; webUrl: string; platform: Platform },
 ): string {
   if (opts.platform === "android") {
     return toIntent(opts.webUrl, "com.google.android.apps.maps");
-  }
-  if (opts.googlePlaceId) {
-    return `comgooglemaps://?q=place_id:${encodeURIComponent(opts.googlePlaceId)}`;
   }
   return `comgooglemaps://?q=${encodeURIComponent(opts.businessName)}`;
 }
@@ -94,40 +82,5 @@ export async function resolveListingUrl(url: string): Promise<string> {
     return parsed.toString();
   } catch {
     return url;
-  }
-}
-
-/**
- * Look up a Google Place ID for a business using the Places API (New).
- * Returns undefined if the API key isn't configured or the lookup fails.
- */
-export async function lookupPlaceId(
-  businessName: string,
-): Promise<string | undefined> {
-  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
-  if (!apiKey) return undefined;
-
-  try {
-    const res = await fetch(
-      "https://places.googleapis.com/v1/places:searchText",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Goog-Api-Key": apiKey,
-          "X-Goog-FieldMask": "places.id",
-        },
-        body: JSON.stringify({ textQuery: businessName }),
-      },
-    );
-
-    if (!res.ok) return undefined;
-
-    const data = (await res.json()) as {
-      places?: { id: string }[];
-    };
-    return data.places?.[0]?.id;
-  } catch {
-    return undefined;
   }
 }
